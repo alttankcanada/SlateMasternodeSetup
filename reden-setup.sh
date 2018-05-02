@@ -1,18 +1,18 @@
 #!/bin/bash
-# REDEN Masternode Setup Script V1.3 for Ubuntu 16.04 LTS
-# (c) 2018 by Allroad [FasterPool.com] for Reden 
+# SLATE Masternode Setup Script V1.3 for Ubuntu 16.04 LTS
+# (c) 2018 by Dwigt007 for Slate 
 #
 # Script will attempt to autodetect primary public IP address
 # and generate masternode private key unless specified in command line
 #
 # Usage:
-# bash reden-setup.sh [Masternode_Private_Key]
+# bash slc-setup.sh [Masternode_Private_Key]
 #
 # Example 1: Existing genkey created earlier is supplied
-# bash reden-setup.sh 27dSmwq9CabKjo2L3UD1HvgBP3ygbn8HdNmFiGFoVbN1STcsypy
+# bash slc-setup.sh 27dSmwq9CabKjo2L3UD1HvgBP3ygbn8HdNmFiGFoVbN1STcsypy
 #
 # Example 2: Script will generate a new genkey automatically
-# bash reden-setup.sh
+# bash slc-setup.sh
 #
 
 #Color codes
@@ -21,8 +21,8 @@ GREEN='\033[1;32m'
 YELLOW='\033[1;33m'
 NC='\033[0m' # No Color
 
-#Reden TCP port
-PORT=13058
+#Slate TCP port
+PORT=52482
 
 #Clear keyboard input buffer
 function clear_stdin { while read -r -t 0; do read -r; done; }
@@ -32,17 +32,17 @@ function delay { echo -e "${GREEN}Sleep for $1 seconds...${NC}"; sleep "$1"; }
 
 #Stop daemon if it's already running
 function stop_daemon {
-    if pgrep -x 'redend' > /dev/null; then
-        echo -e "${YELLOW}Attempting to stop redend${NC}"
-        reden-cli stop
+    if pgrep -x 'slcd' > /dev/null; then
+        echo -e "${YELLOW}Attempting to stop slcd${NC}"
+        slc-cli stop
         delay 30
-        if pgrep -x 'redend' > /dev/null; then
-            echo -e "${RED}redend daemon is still running!${NC} \a"
+        if pgrep -x 'slcd' > /dev/null; then
+            echo -e "${RED}slcd daemon is still running!${NC} \a"
             echo -e "${YELLOW}Attempting to kill...${NC}"
-            pkill redend
+            pkill slcd
             delay 30
-            if pgrep -x 'redend' > /dev/null; then
-                echo -e "${RED}Can't stop redend! Reboot and try again...${NC} \a"
+            if pgrep -x 'slcd' > /dev/null; then
+                echo -e "${RED}Can't stop slcd! Reboot and try again...${NC} \a"
                 exit 2
             fi
         fi
@@ -127,59 +127,59 @@ fi
 
 #Installing Daemon
 cd ~
-#sudo rm reden_ubuntu16_1.0.0_linux.gz
-#wget https://github.com/NicholasAdmin/Reden/releases/download/Wallet/reden_ubuntu16_1.0.0_linux.gz
-#sudo tar -xzvf reden_ubuntu16_1.0.0_linux.gz --strip-components 1 --directory /usr/bin
-#sudo rm reden_ubuntu16_1.0.0_linux.gz
+#sudo rm slc-qt-wallet-1.0.1-linux.zip
+#wget https://github.com/slateprojectteam/slate-core-wallet/releases/download/1.0.1/slc-qt-wallet-1.0.1-linux.zip
+#sudo tar -xzvf slc-qt-wallet-1.0.1-linux.zip --strip-components 1 --directory /usr/bin
+#sudo rm slc-qt-wallet-1.0.1-linux.zip
 
 stop_daemon
 
 # Deploy binaries to /usr/bin
-sudo cp RedenMasternodeSetup/Reden-v1.0-Ubuntu16.04/reden* /usr/bin/
-sudo chmod 755 -R ~/RedenMasternodeSetup
-sudo chmod 755 /usr/bin/reden*
+sudo cp SlateMasternodeSetup/slc-qt-wallet-1.0.1-linux/slc* /usr/bin/
+sudo chmod 755 -R ~/SlateMasternodeSetup
+sudo chmod 755 /usr/bin/slc*
 
 # Deploy masternode monitoring script
-cp ~/RedenMasternodeSetup/nodemon.sh /usr/local/bin
+cp ~/SlateMasternodeSetup/nodemon.sh /usr/local/bin
 sudo chmod 711 /usr/local/bin/nodemon.sh
 
-#Create reden datadir
+#Create slate datadir
 if [ ! -f ~/.redencore/reden.conf ]; then 
 	sudo mkdir ~/.redencore
 fi
 
-echo -e "${YELLOW}Creating reden.conf...${NC}"
+echo -e "${YELLOW}Creating slc.conf...${NC}"
 
 # If genkey was not supplied in command line, we will generate private key on the fly
 if [ -z $genkey ]; then
     cat <<EOF > ~/.redencore/reden.conf
-rpcuser=redenrpc
+rpcuser=slaterpc
 rpcpassword=$rpcpassword
 EOF
 
-    sudo chmod 755 -R ~/.redencore/reden.conf
+    sudo chmod 755 -R ~/.redencore/slc.conf
 
     #Starting daemon first time just to generate masternode private key
-    redend -daemon
+    slcd -daemon
     delay 30
 
     #Generate masternode private key
     echo -e "${YELLOW}Generating masternode private key...${NC}"
-    genkey=$(reden-cli masternode genkey)
+    genkey=$(slc-cli masternode genkey)
     if [ -z "$genkey" ]; then
         echo -e "${RED}ERROR:${YELLOW}Can not generate masternode private key.$ \a"
         echo -e "${RED}ERROR:${YELLOW}Reboot VPS and try again or supply existing genkey as a parameter."
         exit 1
     fi
     
-    #Stopping daemon to create reden.conf
+    #Stopping daemon to create slc.conf
     stop_daemon
     delay 30
 fi
 
-# Create reden.conf
-cat <<EOF > ~/.redencore/reden.conf
-rpcuser=redenrpc
+# Create slc.conf
+cat <<EOF > ~/.redencore/slc.conf
+rpcuser=slaterpc
 rpcpassword=$rpcpassword
 rpcallowip=127.0.0.1
 onlynet=ipv4
@@ -192,12 +192,12 @@ masternode=1
 masternodeprivkey=$genkey
 EOF
 
-#Finally, starting reden daemon with new reden.conf
-redend
+#Finally, starting slate daemon with new slc.conf
+slcd
 delay 5
 
 #Setting auto star cron job for redend
-cronjob="@reboot sleep 30 && redend"
+cronjob="@reboot sleep 30 && slcd"
 crontab -l > tempcron
 if ! grep -q "$cronjob" tempcron; then
     echo -e "${GREEN}Configuring crontab job...${NC}"
@@ -215,7 +215,7 @@ Masternode was installed with VPS IP Address: ${YELLOW}$publicip${NC}
 Masternode Private Key: ${YELLOW}$genkey${NC}
 
 Now you can add the following string to the masternode.conf file
-for your Hot Wallet (the wallet with your Reden collateral funds):
+for your Hot Wallet (the wallet with your Slate collateral funds):
 ======================================================================== \a"
 echo -e "${YELLOW}mn1 $publicip:$PORT $genkey TxId TxIdx${NC}"
 echo -e "========================================================================
@@ -258,7 +258,7 @@ Masternode Status to change to: 'Masternode successfully started'.
 This will indicate that your masternode is fully functional and
 you can celebrate this achievement!
 
-Currently your masternode is syncing with the Reden network...
+Currently your masternode is syncing with the Slate network...
 
 The following screen will display in real-time
 the list of peer connections, the status of your masternode,
@@ -276,20 +276,20 @@ Here are some useful commands and tools for masternode troubleshooting:
 ========================================================================
 To view masternode configuration produced by this script in reden.conf:
 
-${YELLOW}cat ~/.redencore/reden.conf${NC}
+${YELLOW}cat ~/.redencore/slc.conf${NC}
 
-Here is your reden.conf generated by this script:
+Here is your slc.conf generated by this script:
 -------------------------------------------------${YELLOW}"
-cat ~/.redencore/reden.conf
+cat ~/.redencore/slc.conf
 echo -e "${NC}-------------------------------------------------
 
-NOTE: To edit reden.conf, first stop the redend daemon,
-then edit the reden.conf file and save it in nano: (Ctrl-X + Y + Enter),
-then start the redend daemon back up:
+NOTE: To edit slc.conf, first stop the slcd daemon,
+then edit the slc.conf file and save it in nano: (Ctrl-X + Y + Enter),
+then start the slcd daemon back up:
 
-to stop:   ${YELLOW}eden-cli stop${NC}
-to edit:   ${YELLOW}nano ~/.redencore/reden.conf${NC}
-to start:  ${YELLOW}edend${NC}
+to stop:   ${YELLOW}slc-cli stop${NC}
+to edit:   ${YELLOW}nano ~/.redencore/slc.conf${NC}
+to start:  ${YELLOW}slcd${NC}
 ========================================================================
 To view Redend debug log showing all MN network activity in realtime:
 
@@ -308,10 +308,9 @@ or just type 'node' and hit <TAB> to autocomplete script name.
 ========================================================================
 
 
-Enjoy your Reden Masternode and thanks for using this setup script!
+Enjoy your Slate Masternode and thanks for using this setup script!
 
-If you found it helpful, please donate REDEN to:
-RCdYg5yq3YfymwrZi8EMBSFHxcwR7acniS
+Authors : Allroad [fasterpool] . Dwigt007
 
 ...and make sure to check back for updates!
 
