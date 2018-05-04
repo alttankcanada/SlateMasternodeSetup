@@ -226,6 +226,27 @@ Masternode Status:
   "status": "Masternode successfully started"
 }
 ===========================================================================
+Masternode Sync Status:
+# slc-cli -datadir=/root/.slc mnsync status
+{
+    "IsBlockchainSynced" : true,
+    "lastMasternodeList" : 1525452491,
+    "lastMasternodeWinner" : 1525452687,
+    "lastBudgetItem" : 0,
+    "lastFailure" : 0,
+    "nCountFailures" : 0,
+    "sumMasternodeList" : 5,
+    "sumMasternodeWinner" : 210,
+    "sumBudgetItemProp" : 0,
+    "sumBudgetItemFin" : 0,
+    "countMasternodeList" : 1,
+    "countMasternodeWinner" : 3,
+    "countBudgetItemProp" : 4,
+    "countBudgetItemFin" : 4,
+    "RequestedMasternodeAssets" : 999,
+    "RequestedMasternodeAttempt" : 0
+}
+===========================================================================
 Masternode Information:
 # slc-cli -datadir=/root/.slc getinfo
 {
