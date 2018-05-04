@@ -276,6 +276,6 @@ Press Ctrl-C to Exit...
 
 
 If you found this script and masternode setup guide helpful...
-...please donate SLATE to: 
+...please donate SLATE to: DSEeKkkC7FC26MFF69Fvh3HMwRJZny2LJf
 or just send hash to : https://fasterpool.com We have 0% fees and hourly payouts!
 -Authors: Allroad, Dwigt007
