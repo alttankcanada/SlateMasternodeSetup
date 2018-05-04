@@ -24,7 +24,9 @@ uptime
 echo '==========================================================================='
 echo 'Masternode Status: \n# slc-cli masternode status' && slc-cli -datadir=$datadir masternode status
 echo '==========================================================================='
-echo 'Masternode Information: \n# slc-cli getinfo' && reden-cli -datadir=$datadir getinfo
+echo 'Masternode Information: \n# slc-cli mnsync status' && slc-cli -datadir=$datadir mnsync status
+echo '==========================================================================='
+echo 'Masternode Information: \n# slc-cli getinfo' && slc-cli -datadir=$datadir getinfo
 echo '==========================================================================='
 echo 'Usage: nodemon.sh [refresh delay] [datadir index]'
 echo 'Example: nodemon.sh 10 22 will run every 10 seconds and query slcd in /$USER/.slc22'
