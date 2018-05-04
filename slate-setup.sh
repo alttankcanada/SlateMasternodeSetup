@@ -365,7 +365,7 @@ delay 5
 
 
 
-#Setting auto star cron job for slcd
+#Setting auto start cron job for slcd
 
 cronjob="@reboot sleep 30 && slcd"
 crontab -l > tempcron
