@@ -475,9 +475,11 @@ or just type 'node' and hit <TAB> to autocomplete script name.
 
 Enjoy your Slate Masternode and thanks for using this setup script!
 
-Authors : Allroad [fasterpool] . Dwigt007
+If you found this script helpful...
+...please donate SLATE to: DSEeKkkC7FC26MFF69Fvh3HMwRJZny2LJf
 
 ...and make sure to check back for updates!
+Authors : Allroad [fasterpool] , Dwigt007
 
 "
 delay 30
