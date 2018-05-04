@@ -316,6 +316,11 @@ maxconnections=64
 externalip=$publicip
 masternode=1
 masternodeprivkey=$genkey
+addnode=206.189.170.169
+addnode=206.189.69.60
+addnode=59.149.105.66
+addnode=114.35.232.36
+addnode=59.127.126.4
 
 EOF
 
