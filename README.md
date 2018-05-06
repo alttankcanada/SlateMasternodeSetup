@@ -25,6 +25,8 @@ Copy it somewhere safe. You will use these in the masternode.conf file for your 
 
 To download (clone) the script and binaries to your VPS, use the following command in VPS Linux console:
 
+__NOTE__ in the case of git command not found. You can install 'git' using ``` sudo apt-get install git```
+
 ```bash
 cd ~
 git clone https://github.com/Dwigt007/SlateMasternodeSetup.git
