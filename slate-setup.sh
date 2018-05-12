@@ -1,12 +1,12 @@
 #!/bin/bash
-# SLATE Masternode Setup Script V1.3 for Ubuntu 16.04 LTS
+# SLATE Masternode Setup Script V1.4 for Ubuntu 16.04 LTS
 # (c) 2018 by Dwigt007 for Slate 
 #
 # Script will attempt to autodetect primary public IP address
 # and generate masternode private key unless specified in command line
 #
 # Usage:
-# bash slc-setup.sh [Masternode_Private_Key]
+# bash slate-setup.sh [Masternode_Private_Key]
 #
 # Example 1: Existing genkey created earlier is supplied
 # bash slate-setup.sh 27dSmwq9CabKjo2L3UD1HvgBP3ygbn8HdNmFiGFoVbN1STcsypy
@@ -15,18 +15,15 @@
 # bash slate-setup.sh
 #
 #Color codes
-
 RED='\033[0;91m'
-
 GREEN='\033[1;32m'
-
 YELLOW='\033[1;33m'
-
 NC='\033[0m' # No Color
 
 #Slate TCP port
 
-PORT=52482
+PORT=13888
+RPC=51473
 
 #Clear keyboard input buffer
 
@@ -40,27 +37,21 @@ function delay { echo -e "${GREEN}Sleep for $1 seconds...${NC}"; sleep "$1"; }
 
 function stop_daemon {
 
-    if pgrep -x 'slcd' > /dev/null; then
+    if pgrep -x 'slatechaind' > /dev/null; then
 
-        echo -e "${YELLOW}Attempting to stop slcd${NC}"
-	slc-cli stop
+        echo -e "${YELLOW}Attempting to stop slatechaind${NC}"
+	slatechain-cli stop
 	delay 30
 
-        if pgrep -x 'slcd' > /dev/null; then
-
-            echo -e "${RED}slcd daemon is still running!${NC} \a"
-
+        if pgrep -x 'slatechaind' > /dev/null; then
+            echo -e "${RED}slatechaind daemon is still running!${NC} \a"
             echo -e "${YELLOW}Attempting to kill...${NC}"
-
-            pkill slcd
-
+            pkill slatechaind
             delay 30
 
-            if pgrep -x 'slcd' > /dev/null; then
-
-                echo -e "${RED}Can't stop slcd! Reboot and try again...${NC} \a"
-
-                exit 2
+            if pgrep -x 'slatechaind' > /dev/null; then
+               echo -e "${RED}Can't stop slatechaind! Reboot and try again...${NC} \a"
+        exit 2
 
             fi
 
@@ -138,39 +129,24 @@ echo -e "${RED}
  ${NC}"
 delay 5
 
-echo -e "${YELLOW}SLATE Masternode Setup Script V1.3 for Ubuntu 16.04 LTS${NC}"
-
+echo -e "${YELLOW}SLATE Masternode Setup Script V1.4 for Ubuntu 16.04 LTS${NC}"
 echo -e "${GREEN}Updating system and installing required packages...${NC}"
-
 sudo DEBIAN_FRONTEND=noninteractive apt-get update -y
 
-
-
 # Determine primary public IP address
-
 dpkg -s dnsutils 2>/dev/null >/dev/null || sudo apt-get -y install dnsutils
-
 publicip=$(dig +short myip.opendns.com @resolver1.opendns.com)
 
-
-
 if [ -n "$publicip" ]; then
-
-    echo -e "${YELLOW}IP Address detected:" $publicip ${NC}
-
+     echo -e "${YELLOW}IP Address detected:" $publicip ${NC}
 else
+     echo -e "${RED}ERROR: Public IP Address was not detected!${NC} \a"
 
-    echo -e "${RED}ERROR:${YELLOW} Public IP Address was not detected!${NC} \a"
-
-    clear_stdin
-
-    read -e -p "Enter VPS Public IP Address: " publicip
-
-    if [ -z "$publicip" ]; then
-
-        echo -e "${RED}ERROR:${YELLOW} Public IP Address must be provided. Try again...${NC} \a"
-
-        exit 1
+ clear_stdin
+         read -e -p "Enter VPS Public IP Address: " publicip
+     if [ -z "$publicip" ]; then
+         echo -e "${RED}ERROR: Public IP Address must be provided. Try again...${NC} \a"
+     exit 1
 
     fi
 
@@ -202,7 +178,7 @@ sudo ufw default deny incoming
 sudo ufw default allow outgoing
 sudo ufw allow ssh
 sudo ufw allow $PORT/tcp
-sudo ufw allow 52483/tcp
+sudo ufw allow $RPC/tcp
 sudo ufw allow 22/tcp
 sudo ufw limit 22/tcp
 echo -e "${YELLOW}"
@@ -211,7 +187,8 @@ sudo ufw --force enable
 
 echo -e "${NC}"
 
-#Generating Random Password for slcd JSON RPC
+#Generating Random Password for slatechaind JSON RPC
+rpcuser=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1)
 rpcpassword=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1)
 
 #Create 2GB swap file
@@ -221,49 +198,40 @@ if grep -q "SwapTotal" /proc/meminfo; then
 
 else
 
-    echo -e "${YELLOW}Creating 2GB disk swap file. \nThis may take a few minutes!${NC} \a"
-
-    touch /var/swap.img
-
-    chmod 600 swap.img
-
-    dd if=/dev/zero of=/var/swap.img bs=1024k count=2000
-
-    mkswap /var/swap.img 2> /dev/null
-
-    swapon /var/swap.img 2> /dev/null
+ echo -e "${YELLOW}Creating 2GB disk swap file. \nThis may take a few minutes!${NC} \a"
+touch /var/swap.img
+chmod 600 swap.img
+dd if=/dev/zero of=/var/swap.img bs=1024k count=2000
+mkswap /var/swap.img 2> /dev/null
+swapon /var/swap.img 2> /dev/null
 
     if [ $? -eq 0 ]; then
 
         echo '/var/swap.img none swap sw 0 0' >> /etc/fstab
-
         echo -e "${GREEN}Swap was created successfully!${NC} \n"
 
     else
-
-        echo -e "${YELLOW}Operation not permitted! Optional swap was not created.${NC} \a"
-
+        echo -e "${RED}Operation not permitted! Optional swap was not created.${NC} \a"
         rm /var/swap.img
-
-    fi
+     fi
 fi
 
 #Installing Daemon
 
 cd ~
 
-#sudo rm slc-qt-wallet-1.0.1-linux.zip
-#wget https://github.com/slateprojectteam/slate-core-wallet/releases/download/1.0.1/slc-qt-wallet-1.0.1-linux.zip
-#sudo tar -xzvf slc-qt-wallet-1.0.1-linux.zip --strip-components 1 --directory /usr/bin
-#sudo rm slc-qt-wallet-1.0.1-linux.zip
+#sudo rm sltc-1.0.3-x86_64-linux.zip
+#wget https://github.com/SlateTeam/SlatechainCore/releases/download/1.0.3/sltc-1.0.3-x86_64-linux.zip
+#sudo tar -xzvf sltc-1.0.3-x86_64-linux.zip --strip-components 1 --directory /usr/bin
+#sudo rm sltc-1.0.3-x86_64-linux.zip
 
 stop_daemon
 
 # Deploy binaries to /usr/bin
 
-sudo cp SlateMasternodeSetup/slc-qt-wallet-1.0.1-linux/slc* /usr/bin/
+sudo cp SlateMasternodeSetup/lin-slatechain-qt/slatechain* /usr/bin/
 sudo chmod 755 -R ~/SlateMasternodeSetup
-sudo chmod 755 /usr/bin/slc*
+sudo chmod 755 /usr/bin/slatechain*
 
 # Deploy masternode monitoring script
 
@@ -272,75 +240,53 @@ sudo chmod 711 /usr/local/bin/nodemon.sh
 
 #Create slate datadir
 
-if [ ! -f ~/.slc/slc.conf ]; then 
-
-	sudo mkdir ~/.slc
+if [ ! -f ~/.sltc/slatechain.conf ]; then 
+      sudo mkdir ~/.sltc
 fi
-
-echo -e "${YELLOW}Creating slc.conf...${NC}"
+echo -e "${YELLOW}Creating slatechain.conf...${NC}"
 
 # If genkey was not supplied in command line, we will generate private key on the fly
 
 if [ -z $genkey ]; then
 
-    cat <<EOF > ~/.slc/slc.conf
-
-rpcuser=rpcuser
+    cat <<EOF > ~/.sltc/slatechain.conf
+rpcuser=$rpcuser
 rpcpassword=$rpcpassword
 
 EOF
+      sudo chmod 755 -R ~/.sltc/slatechain.conf
 
-
-
-    sudo chmod 755 -R ~/.slc/slc.conf
-
-
-
-    #Starting daemon first time just to generate masternode private key
-
-    slcd -daemon
-
+#Starting daemon first time just to generate masternode private key
+    slatechaind -daemon
     delay 30
 
-
-
-    #Generate masternode private key
+#Generate masternode private key
 
     echo -e "${YELLOW}Generating masternode private key...${NC}"
-
-    genkey=$(slc-cli masternode genkey)
+    genkey=$(slatechain-cli masternode genkey)
 
     if [ -z "$genkey" ]; then
 
-        echo -e "${RED}ERROR:${YELLOW}Can not generate masternode private key.$ \a"
-
-        echo -e "${RED}ERROR:${YELLOW}Reboot VPS and try again or supply existing genkey as a parameter."
-
-        exit 1
-
-    fi
-
-    
-
-    #Stopping daemon to create slc.conf
-
+        echo -e "${RED}ERROR: Can not generate masternode private key.${NC} \a"
+        echo -e "${RED}ERROR: Reboot VPS and try again or supply existing genkey as a parameter.${NC}"
+   exit 1
+fi
+#Stopping daemon to create slatechain.conf
     stop_daemon
-
     delay 30
-
 fi
 
 
 
-# Create slc.conf
+# Create sltc.conf
 
-cat <<EOF > ~/.slc/slc.conf
+cat <<EOF > ~/.sltc/slatechain.conf
 
-rpcuser=rpcuser
+rpcuser=$rpcuser
 rpcpassword=$rpcpassword
 rpcallowip=127.0.0.1
 onlynet=ipv4
-rpcport=52483
+rpcport=$RPC
 listen=1
 server=1
 daemon=1
@@ -356,25 +302,18 @@ addnode=59.127.126.4
 
 EOF
 
+#Finally, starting slate daemon with new sltc.conf
 
-
-#Finally, starting slate daemon with new slc.conf
-
-slcd
+slatechaind
 delay 5
 
+#Setting auto start cron job for sltcd
 
-
-#Setting auto start cron job for slcd
-
-cronjob="@reboot sleep 30 && slcd"
+cronjob="@reboot sleep 30 && sltcd"
 crontab -l > tempcron
 if ! grep -q "$cronjob" tempcron; then
-
     echo -e "${GREEN}Configuring crontab job...${NC}"
-
     echo $cronjob >> tempcron
-
     crontab tempcron
 
 fi
@@ -465,32 +404,32 @@ ${GREEN}...scroll up to see previous screens...${NC}
 
 Here are some useful commands and tools for masternode troubleshooting:
 ========================================================================
-To view masternode configuration produced by this script in slc.conf:
+To view masternode configuration produced by this script in sltc.conf:
 
-      ${YELLOW}cat ~/.slc/slc.conf${NC}
-Here is your slc.conf generated by this script:
+      ${YELLOW}cat ~/.sltc/slatechain.conf${NC}
+Here is your slatechain.conf generated by this script:
 -------------------------------------------------${YELLOW}"
 
-cat ~/.slc/slc.conf
+cat ~/.sltc/slatechain.conf
 
 echo -e "${NC}-------------------------------------------------
 
 
 
-NOTE: To edit slc.conf, first stop the slcd daemon,
-then edit the slc.conf file and save it in nano: (Ctrl-X + Y + Enter),
-then start the slcd daemon back up:
+NOTE: To edit slatechain.conf, first stop the slatechaind daemon,
+then edit the slatechain.conf file and save it in nano: (Ctrl-X + Y + Enter),
+then start the slatechaind daemon back up:
 
-           to stop:   ${YELLOW}slc-cli stop${NC}
+           to stop:   ${YELLOW}slatechain-cli stop${NC}
 
-           to edit:   ${YELLOW}nano ~/.slc/slc.conf${NC}
+           to edit:   ${YELLOW}nano ~/.sltc/slatechain.conf${NC}
 
-           to start:  ${YELLOW}slcd${NC}
+           to start:  ${YELLOW}slatechaind${NC}
 
 ========================================================================
-To view slcd debug log showing all MN network activity in realtime:
+To view sltcd debug log showing all MN network activity in realtime:
 
-           ${YELLOW}tail -f ~/.slc/debug.log${NC}
+           ${YELLOW}tail -f ~/.sltc/debug.log${NC}
 
 ========================================================================
 To monitor system resource utilization and running processes:
@@ -508,10 +447,10 @@ or just type 'node' and hit <TAB> to autocomplete script name.
 Enjoy your Slate Masternode and thanks for using this setup script!
 
 If you found this script helpful...
-...please donate SLATE to: DSEeKkkC7FC26MFF69Fvh3HMwRJZny2LJf
+...please donate SLATE to: 
 
 ...and make sure to check back for updates!
-Authors : Allroad [fasterpool] , Dwigt007
+Authors : Dwigt007 , Allroad
 
 "
 delay 30
