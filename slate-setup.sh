@@ -220,18 +220,18 @@ fi
 
 cd ~
 
-#sudo rm sltc-1.0.3-x86_64-linux.zip
-#wget https://github.com/SlateTeam/SlatechainCore/releases/download/1.0.3/sltc-1.0.3-x86_64-linux.zip
-#sudo tar -xzvf sltc-1.0.3-x86_64-linux.zip --strip-components 1 --directory /usr/bin
-#sudo rm sltc-1.0.3-x86_64-linux.zip
+sudo rm sltc-1.0.3-x86_64-linux.zip
+wget https://github.com/SlateTeam/SlatechainCore/releases/download/1.0.3/sltc-1.0.3-x86_64-linux.zip
+sudo tar -xzvf sltc-1.0.3-x86_64-linux.zip --strip-components 1 --directory /usr/bin
+sudo rm sltc-1.0.3-x86_64-linux.zip
 
 stop_daemon
 
 # Deploy binaries to /usr/bin
 
-sudo cp SlateMasternodeSetup/lin-slatechain-qt/slatechain* /usr/bin/
-sudo chmod 755 -R ~/SlateMasternodeSetup
-sudo chmod 755 /usr/bin/slatechain*
+#sudo cp SlateMasternodeSetup/lin-slatechain-qt/slatechain* /usr/bin/
+#sudo chmod 755 -R ~/SlateMasternodeSetup
+#sudo chmod 755 /usr/bin/slatechain*
 
 # Deploy masternode monitoring script
 
