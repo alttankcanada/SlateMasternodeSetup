@@ -231,7 +231,8 @@ stop_daemon
 
 #sudo cp SlateMasternodeSetup/lin-slatechain-qt/slatechain* /usr/bin/
 sudo chmod 755 -R ~/SlateMasternodeSetup
-sudo chmod 755 /usr/bin/sltc*
+
+sudo chmod 755 /usr/bin/lin-slatechain-qt.exe*
 
 # Deploy masternode monitoring script
 
@@ -257,7 +258,8 @@ EOF
       sudo chmod 755 -R ~/.sltc/slatechain.conf
 
 #Starting daemon first time just to generate masternode private key
-    ./slatechaind --daemon
+cd lin-slatechain-qt.exe
+   ./slatechaind --daemon
     delay 30
 
 #Generate masternode private key
@@ -279,7 +281,7 @@ fi
 
 
 # Create sltc.conf
-
+cd ~
 cat <<EOF > ~/.sltc/slatechain.conf
 
 rpcuser=$rpcuser
@@ -303,13 +305,13 @@ addnode=59.127.126.4
 EOF
 
 #Finally, starting slate daemon with new sltc.conf
-
+cd lin-slatechain-qt.exe
 ./slatechaind
 delay 5
 
 #Setting auto start cron job for sltcd
 
-cronjob="@reboot sleep 30 && ./slatechaind"
+cronjob="@reboot sleep 30 && ~/lin-slatechain-qt.exe/slatechaind"
 crontab -l > tempcron
 if ! grep -q "$cronjob" tempcron; then
     echo -e "${GREEN}Configuring crontab job...${NC}"
