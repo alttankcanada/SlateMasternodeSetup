@@ -40,13 +40,13 @@ function stop_daemon {
     if pgrep -x 'slatechaind' > /dev/null; then
 
         echo -e "${YELLOW}Attempting to stop slatechaind${NC}"
-	./slatechain-cli stop
+	slatechain-cli stop
 	delay 30
 
         if pgrep -x 'slatechaind' > /dev/null; then
             echo -e "${RED}slatechaind daemon is still running!${NC} \a"
             echo -e "${YELLOW}Attempting to kill...${NC}"
-            pkill ./slatechaind
+            pkill slatechaind
             delay 30
 
             if pgrep -x 'slatechaind' > /dev/null; then
@@ -222,7 +222,7 @@ cd ~
 
 sudo rm sltc-1.0.3-x86_64-linux
 wget https://github.com/SlateTeam/SlatechainCore/releases/download/v1.0.3/sltc-1.0.3-x86_64-linux.zip
-unzip sltc-1.0.3-x86_64-linux --directory /usr/bin
+unzip sltc-1.0.3-x86_64-linux 
 sudo rm sltc-1.0.3-x86_64-linux.zip
 
 stop_daemon
