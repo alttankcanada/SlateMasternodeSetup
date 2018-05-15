@@ -40,13 +40,13 @@ function stop_daemon {
     if pgrep -x 'slatechaind' > /dev/null; then
 
         echo -e "${YELLOW}Attempting to stop slatechaind${NC}"
-	slatechain-cli stop
+	./slatechain-cli stop
 	delay 30
 
         if pgrep -x 'slatechaind' > /dev/null; then
             echo -e "${RED}slatechaind daemon is still running!${NC} \a"
             echo -e "${YELLOW}Attempting to kill...${NC}"
-            pkill slatechaind
+            pkill ./slatechaind
             delay 30
 
             if pgrep -x 'slatechaind' > /dev/null; then
@@ -220,9 +220,9 @@ fi
 
 cd ~
 
-sudo rm sltc-1.0.3-x86_64-linux.zip
+sudo rm sltc-1.0.3-x86_64-linux
 wget https://github.com/SlateTeam/SlatechainCore/releases/download/v1.0.3/sltc-1.0.3-x86_64-linux.zip
-sudo tar -xzvf sltc-1.0.3-x86_64-linux.zip --strip-components 1 --directory /usr/bin
+unzip sltc-1.0.3-x86_64-linux --directory /usr/bin
 sudo rm sltc-1.0.3-x86_64-linux.zip
 
 stop_daemon
@@ -230,8 +230,8 @@ stop_daemon
 # Deploy binaries to /usr/bin
 
 #sudo cp SlateMasternodeSetup/lin-slatechain-qt/slatechain* /usr/bin/
-#sudo chmod 755 -R ~/SlateMasternodeSetup
-#sudo chmod 755 /usr/bin/slatechain*
+sudo chmod 755 -R ~/SlateMasternodeSetup
+sudo chmod 755 /usr/bin/sltc*
 
 # Deploy masternode monitoring script
 
@@ -257,13 +257,13 @@ EOF
       sudo chmod 755 -R ~/.sltc/slatechain.conf
 
 #Starting daemon first time just to generate masternode private key
-    slatechaind -daemon
+    ./slatechaind --daemon
     delay 30
 
 #Generate masternode private key
 
     echo -e "${YELLOW}Generating masternode private key...${NC}"
-    genkey=$(slatechain-cli masternode genkey)
+    genkey=$(./slatechain-cli masternode genkey)
 
     if [ -z "$genkey" ]; then
 
@@ -304,12 +304,12 @@ EOF
 
 #Finally, starting slate daemon with new sltc.conf
 
-slatechaind
+./slatechaind
 delay 5
 
 #Setting auto start cron job for sltcd
 
-cronjob="@reboot sleep 30 && sltcd"
+cronjob="@reboot sleep 30 && ./slatechaind"
 crontab -l > tempcron
 if ! grep -q "$cronjob" tempcron; then
     echo -e "${GREEN}Configuring crontab job...${NC}"
