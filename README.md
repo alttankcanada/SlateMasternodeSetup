@@ -1,6 +1,5 @@
 ## SLATE Masternode Installation
 
-##BETA RELEASE USE AT YOUR OWN RISK
 
 **NOTE:** This installation guide is provided as is with no warranties of any kind.
 
@@ -65,7 +64,7 @@ It does not matter which way you open the file or how you edit it. In either cas
 mn1 231.321.11.22:52482 27KTCRKgqjBgQbAS2BN9uX8GHBu16wXfr4z4hNDZWQAubqD8fr6 5d46f69f1770cb051baf594d011f8fa5e12b502ff18509492de28adfe2bbd229 0
 ```
 The format for this string is as follow:
-```basg
+```bash
 masternodealias publicipaddress:52482 masternodeprivatekey output-tx-ID output-tx-index
 ```
 Where: 
@@ -121,15 +120,15 @@ Go back to your VPS and wait for the status of your new masternode to change to 
 Finally, to **monitor your masternode status** you can use the following commands in Linux console of your masternode VPS:
 
 ```bash
-slc-cli masternode status
+slatechain-cli masternode status
 
-slc-cli getinfo
+slatechain-cli getinfo
 ```
 
 If you are really bored waiting for the sync to complete, you can watch what your masternode is doing on the network at any time by using tail to monitor the debug.log file in realtime:
 
 ```bash
-sudo tail -f ~/.slc/debug.log
+sudo tail -f ~/.slatechain/debug.log
 ```
 
 And for those who wonder what does **slc.conf** file looks like for a typical masternode which the setup script generates, here's an example below...
@@ -138,7 +137,7 @@ Note that both, the __externalip__ should match the __IP address__ and __mast
 
 Example:
 
-**nano /root/.scl/slc.conf**
+**nano /root/.slatechain/slatechain.conf**
 
 ```bash
 rpcuser=rpcuser
@@ -164,7 +163,7 @@ addnode=59.127.126.4
 The script adds a cron job which starts slcd daemon upon reboot. Try restarting your VPS server (just type reboot in Linux console) and see if your masternode comes back online automatically in a few minutes. Log back in using PuTTY and run the following command to monitor your masternode status:
 
 ```
-watch -n 10 ’slc-cli masternode status && slc-cli getinfo’
+watch -n 10 ’slatechain-cli masternode status && slatechain-cli getinfo’
 ```
 
 The expected output for a functioning masternode will eventually look like this:
@@ -222,7 +221,7 @@ Address               (ms)   (KBytes)   Block  Syncd  Blocks  (min)  Score
  22:14:21 up 3 days, 22:59,  3 users,  load average: 0.01, 0.03, 0.00
 ===========================================================================
 Masternode Status:
-# slc-cli -datadir=/root/.slc masternode status
+# slatechain-cli -datadir=/root/.slatechain masternode status
 {
   "vin": "CTxIn(COutPoint(0a5afa9e8c41d003c4399f089bc54880e05ce8a051d30932d236ba12b5d1040b, 0), scriptSig=)",
   "service": "45.76.12.139:52482”,
@@ -231,7 +230,7 @@ Masternode Status:
 }
 ===========================================================================
 Masternode Sync Status:
-# slc-cli -datadir=/root/.slc mnsync status
+# slatechain-cli -datadir=/root/.slatechain mnsync status
 {
     "IsBlockchainSynced" : true,
     "lastMasternodeList" : 1525452491,
@@ -252,7 +251,7 @@ Masternode Sync Status:
 }
 ===========================================================================
 Masternode Information:
-# slc-cli -datadir=/root/.slc getinfo
+# slatechain-cli -datadir=/root/.slatechain getinfo
 {
   "version": 2000001,
   "protocolversion": 70206,
@@ -280,6 +279,6 @@ Press Ctrl-C to Exit...
 
 
 If you found this script and masternode setup guide helpful...
-...please donate SLATE to: DSEeKkkC7FC26MFF69Fvh3HMwRJZny2LJf
-or just send hash to : https://fasterpool.com We have 0% fees and hourly payouts!
--Authors: Allroad, Dwigt007
+...please donate SLATE to: SPDJmFrPg9Xgn9M2cfJEA3o7QoWidh2dkJ
+
+-Authors: Dwigt007
