@@ -258,7 +258,7 @@ EOF
       sudo chmod 755 -R ~/.slatechain/slatechain.conf
 
 #Starting daemon first time just to generate masternode private key
-   .slatechaind --daemon
+   slatechaind --daemon
     delay 30
 
 #Generate masternode private key
@@ -292,7 +292,7 @@ listen=1
 server=1
 daemon=1
 maxconnections=64
-externalip=$publicip
+externalip=$publicip:$PORT
 masternode=1
 masternodeprivkey=$genkey
 addnode=206.189.170.169
