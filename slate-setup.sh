@@ -225,7 +225,7 @@ wget https://github.com/SlateTeam/SlatechainCore/releases/download/v1.0.3/sltc-1
 unzip sltc-1.0.3-x86_64-linux 
 find ~/lin-slatechain-qt.exe/ -type f -print0 | xargs -0 mv -t ~/SlateMasternodeSetup/sltc-1.0.3-x86_64-linux
 sudo rm -r sltc-1.0.3-x86_64-linux.zip
-sudp rm -r lin-slatechain-qt.exe
+sudo rm -r lin-slatechain-qt.exe
 
 stop_daemon
 
