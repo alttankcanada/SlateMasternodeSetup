@@ -265,7 +265,7 @@ EOF
 #Generate masternode private key
 
     echo -e "${YELLOW}Generating masternode private key...${NC}"
-    genkey=$(slatechain-cli masternode genkey)
+    genkey=$(slatechain-cli createmasternodekey)
 
     if [ -z "$genkey" ]; then
 
@@ -287,20 +287,19 @@ cat <<EOF > ~/.slatechain/slatechain.conf
 rpcuser=$rpcuser
 rpcpassword=$rpcpassword
 rpcallowip=127.0.0.1
-onlynet=ipv4
 rpcport=$RPC
-listen=1
 server=1
+listen=1
 daemon=1
 maxconnections=64
-externalip=$publicip:$PORT
 masternode=1
 masternodeprivkey=$genkey
-addnode=206.189.170.169
-addnode=206.189.69.60
-addnode=59.149.105.66
-addnode=114.35.232.36
-addnode=59.127.126.4
+externalip=$publicip:$PORT
+addnode=149.28.66.151
+addnode=149.28.66.226
+addnode=149.28.65.238
+addnode=149.28.66.230
+addnode=159.65.98.27
 
 EOF
 
