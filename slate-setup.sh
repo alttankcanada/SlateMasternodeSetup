@@ -221,17 +221,15 @@ fi
 cd ~
 mkdir ~/SlateMasternodeSetup/sltc-1.0.3-x86_64-linux 
 sudo rm -r sltc-1.0.3-x86_64-linux
-wget https://github.com/SlateTeam/SlatechainCore/releases/download/v1.0.3/sltc-1.0.3-x86_64-linux.zip
-unzip sltc-1.0.3-x86_64-linux 
-find ~/lin-slatechain-qt.exe/ -type f -print0 | xargs -0 mv -t ~/SlateMasternodeSetup/sltc-1.0.3-x86_64-linux
-sudo rm -r sltc-1.0.3-x86_64-linux.zip
-sudo rm -r lin-slatechain-qt.exe
+wget https://github.com/SlateTeam/SlatechainCore/releases/download/v1.1/v1.1_posfix.tar.gz
+tar xvzf v1.1_posfix.tar.gz
+sudo rm -r v1.1_posfix.tar.gz
 
 stop_daemon
 
 # Deploy binaries to /usr/bin
 
-sudo cp SlateMasternodeSetup/sltc-1.0.3-x86_64-linux/slatechain* /usr/bin/
+sudo cp SlateMasternodeSetup/v1.1_posfix/slatechain* /usr/bin/
 sudo chmod 755 -R ~/SlateMasternodeSetup
 sudo chmod 755 /usr/bin/slatechain*
 
